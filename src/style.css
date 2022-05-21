@@ -1,0 +1,42 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background-color:  rgb(247, 247, 247);
+    font-size: 1vh;
+    color: white;
+    /* cursor: none; */
+}
+
+body {
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    z-index: 1000000;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+}
+
+@media (orientation:portrait) {
+    html {
+        font-size: 1.25vw;
+    }
+}
+@media (orientation:landscape) {
+    html {
+        font-size: 1.25vh;
+    }
+}
+
+.webgl
+{
+    position: fixed;
+    outline: none;
+    box-sizing: border-box;
+    /* border: 2px solid blue; */
+    cursor: grab;
+}

@@ -140,7 +140,10 @@ rightEar.position.y = 2
 rightEar.position.x = -2.8
 robotHead.add(leftEar)
 robotHead.add(rightEar)
-robotHead.position.y = -2
+robotHead.position.set(5,-2,-4)
+
+robotHead.rotation.y = -Math.PI/4
+robotHead.rotation.x = Math.PI/10
 scene.add(robotHead)
 
 // Picture Parameters
@@ -193,22 +196,23 @@ const pm2material = new THREE.RawShaderMaterial({
 
 // Picture Mesh 2
 let pictureMesh2 = new THREE.Mesh(pm2geometry, pm2material)
-pictureMesh2.position.set(0,0,2.51)
+pictureMesh2.position.set(0,2,2.51)
+robotHead.add(pictureMesh2)
 pictureMesh2.frustumCulled = false
-scene.add(pictureMesh2)
 
 // Lighting
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(ambientLight)
 
-const pointLight = new THREE.PointLight(0xffffff, 1)
+const pointLight = new THREE.PointLight(0xffffff, 0.8)
 scene.add(pointLight)
 
 const rectAreaLight = new THREE.RectAreaLight(0xffffff, 15, 4*0.8, 3*0.8)
-rectAreaLight.position.set(0,0,2.51)
-rectAreaLight.lookAt(new THREE.Vector3(0,0,100))
+rectAreaLight.position.set(0,2,2.51)
+rectAreaLight.lookAt(new THREE.Vector3(0,2,100))
 scene.add(rectAreaLight)
+robotHead.add(rectAreaLight)
 
 // Position Checker
 // const box = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.3), new THREE.MeshNormalMaterial)
@@ -251,7 +255,7 @@ scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
-// controls.enabled = false
+controls.enabled = false
 controls.enablePan = false
 controls.enableZoom = false
 
@@ -353,6 +357,10 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    robotHead.rotation.x = Math.sin(elapsedTime) * 0.1
+    robotHead.rotation.y = Math.sin(elapsedTime) * 0.1 - Math.PI/6
+    robotHead.rotation.z = Math.cos(elapsedTime) * 0.1
 
     // Update controls
     if (controls.enabled == true) {

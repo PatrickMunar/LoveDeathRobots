@@ -40,3 +40,73 @@ body {
     /* border: 2px solid blue; */
     cursor: grab;
 }
+
+.section {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Bebas {
+    font-family: 'Bebas Neue', cursive;
+}
+
+.landingText {
+    width: 50vw;
+    height: 50vh;
+    margin-right: 60rem;
+    margin-bottom: 40rem;
+}
+
+.mainTextDiv {
+    height: 25%;
+    width: 100%;
+    text-align: center;
+}
+
+#mainTextDiv1 {
+    font-size: 32rem;
+    padding-bottom: 16rem;
+}
+
+#mainTextDiv2 {
+    font-size: 24.75rem;
+    padding-bottom: 12rem;
+}
+
+#mainTextDiv3 {
+    font-size: 10rem;
+    height: 12%;
+}
+
+#mainTextDiv4 {
+    font-size: 20rem;
+    padding-bottom: 10rem;
+}
+
+.slider {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    background-color: transparent;
+    backdrop-filter: blur(3px);
+}
+
+.Bungee {
+    font-family: 'Bungee Hairline', cursive;
+}
+
+.favFrom {
+    position: absolute;
+    width: 30vw;
+    height: 20vh;
+    top: 0;
+    left: 10vw;
+    /* border: 2px solid red; */
+    color: white;
+    font-size: 4rem;
+}
+

@@ -5,6 +5,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import testVertexShader from './shaders/vertex.glsl'
+import testFragmentShader from './shaders/fragment.glsl'
 import gsap from 'gsap'
 
 // Clear Scroll Memory
@@ -42,6 +44,30 @@ const loadingManager = new THREE.LoadingManager(
 
 // Texture loader
 const textureLoader = new THREE.TextureLoader()
+const textures = []
+textures[0] = textureLoader.load('./images/Happy.png')
+
+const doubleBlinkFrames = []
+doubleBlinkFrames[0] = textureLoader.load('./images/Idle1.png')
+doubleBlinkFrames[1] = textureLoader.load('./images/Idle2.png')
+doubleBlinkFrames[2] = textureLoader.load('./images/Idle3.png')
+doubleBlinkFrames[3] = textureLoader.load('./images/Idle4.png')
+doubleBlinkFrames[4] = textureLoader.load('./images/Idle3.png')
+doubleBlinkFrames[5] = textureLoader.load('./images/Idle2.png')
+doubleBlinkFrames[6] = textureLoader.load('./images/Idle3.png')
+doubleBlinkFrames[7] = textureLoader.load('./images/Idle4.png')
+doubleBlinkFrames[8] = textureLoader.load('./images/Idle3.png')
+doubleBlinkFrames[9] = textureLoader.load('./images/Idle2.png')
+doubleBlinkFrames[10] = textureLoader.load('./images/Idle1.png')
+
+const blinkFrames = []
+blinkFrames[0] = textureLoader.load('./images/Idle1.png')
+blinkFrames[1] = textureLoader.load('./images/Idle2.png')
+blinkFrames[2] = textureLoader.load('./images/Idle3.png')
+blinkFrames[3] = textureLoader.load('./images/Idle4.png')
+blinkFrames[4] = textureLoader.load('./images/Idle3.png')
+blinkFrames[5] = textureLoader.load('./images/Idle2.png')
+blinkFrames[6] = textureLoader.load('./images/Idle1.png')
 
 // Draco loader
 const dracoLoader = new DRACOLoader()
@@ -73,6 +99,8 @@ gltfLoader.load(
         obj.scene.children[1].receiveShadow = true
         obj.scene.children[2].castShadow = true
         obj.scene.children[2].receiveShadow = true
+        obj.scene.children[2].material.emissive = new THREE.Color('#ffffff')
+        obj.scene.children[2].material.emissiveIntensity = 100
         obj.scene.children[3].castShadow = true
         obj.scene.children[3].receiveShadow = true
     }
@@ -115,6 +143,60 @@ robotHead.add(rightEar)
 robotHead.position.y = -2
 scene.add(robotHead)
 
+// Picture Parameters
+const parameters = {
+    widthFactor: 16,
+    heightFactor: 9,
+    amplitudeFactor: 1,
+    speedFactor: 0.75,
+    wideWidthFactor: 4,
+    wideHeightFactor: 3,
+    mapWidthFactor: 4,
+    mapHeightFactor: 3
+}
+
+const waveClickParameters = {
+    waveFrequency: 1,
+    waveAmplitude: 0
+}
+
+const planeSize = {
+    width: 32*parameters.widthFactor,
+    height: 32*parameters.heightFactor,
+    wideWidth: 32*parameters.wideWidthFactor,
+    wideHeight: 32*parameters.wideHeightFactor,
+    mapWidth: 50,
+    mapHeight: 100,
+}
+
+// Picture Parameters
+const pm2geometry = new THREE.PlaneGeometry(parameters.wideWidthFactor * 0.85, parameters.wideHeightFactor * 0.85, planeSize.wideWidth, planeSize.wideHeight)
+const count = pm2geometry.attributes.position.count
+
+// Material
+const pm2material = new THREE.RawShaderMaterial({
+    vertexShader: testVertexShader,
+    fragmentShader: testFragmentShader,
+    uniforms: {
+        uFrequency: {value: waveClickParameters.waveFrequency * 1.5},
+        uTime: {value: 0},
+        uOscillationFrequency: {value: 5},
+        uColor: {value: new THREE.Color('#aa00ff')},
+        uTexture: { value: textures[1] },
+        uAmplitude: {value: waveClickParameters.waveAmplitude},
+        uRotationX: {value: 0},
+        uRotationZ: {value: 1},
+    },
+    transparent: true,
+    side: THREE.DoubleSide,
+})
+
+// Picture Mesh 2
+let pictureMesh2 = new THREE.Mesh(pm2geometry, pm2material)
+pictureMesh2.position.set(0,0,2.51)
+pictureMesh2.frustumCulled = false
+scene.add(pictureMesh2)
+
 // Lighting
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
@@ -122,6 +204,11 @@ scene.add(ambientLight)
 
 const pointLight = new THREE.PointLight(0xffffff, 1)
 scene.add(pointLight)
+
+const rectAreaLight = new THREE.RectAreaLight(0xffffff, 15, 4*0.8, 3*0.8)
+rectAreaLight.position.set(0,0,2.51)
+rectAreaLight.lookAt(new THREE.Vector3(0,0,100))
+scene.add(rectAreaLight)
 
 // Position Checker
 // const box = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.3), new THREE.MeshNormalMaterial)
@@ -202,6 +289,61 @@ const cameraGroup = new THREE.Group
 cameraGroup.add(camera)
 scene.add(cameraGroup)
 
+// Face Animations
+
+let bFrame = -1
+const bFrameInterval = [1, 0.8, 0.8, 0.5, 0.6, 0.7, 0.8]
+
+const blink = () => {
+    if (bFrame == blinkFrames.length - 1) {
+        pm2material.uniforms.uTexture.value = textures[0]
+        bFrame = -1
+        setTimeout(() => {
+            const DBorB = Math.random()
+            if (DBorB < 0.8) {
+                blink()
+            }
+            else {
+                doubleBlink()
+            }
+        }, Math.random()*1000 + 3500)
+    }
+    else {
+        bFrame += 1
+        pm2material.uniforms.uTexture.value = blinkFrames[bFrame]
+        setTimeout(() => {
+            blink()
+        }, bFrameInterval[bFrame]*1000*0.12)
+    }
+}
+
+let dbFrame = -1
+const dbFrameInterval = [1, 0.8, 0.8, 0.5, 0.5, 0.6, 0.5, 0.8, 0.6, 0.8, 1]
+
+const doubleBlink = () => {
+    if (dbFrame == doubleBlinkFrames.length - 1) {
+        pm2material.uniforms.uTexture.value = textures[0]
+        dbFrame = -1
+        setTimeout(() => {
+            const DBorB = Math.random()
+            if (DBorB < 0.8) {
+                blink()
+            }
+            else {
+                doubleBlink()
+            }
+        }, Math.random()*1000 + 3500)
+    }
+    else {
+        dbFrame += 1
+        pm2material.uniforms.uTexture.value = doubleBlinkFrames[dbFrame]
+        setTimeout(() => {
+            doubleBlink()
+        }, dbFrameInterval[dbFrame]*1000*0.12)
+    }
+}
+
+blink()
 /**
  * Animate
  */

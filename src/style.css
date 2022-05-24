@@ -2,6 +2,7 @@
 {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html {
@@ -12,7 +13,7 @@ html {
 }
 
 body {
-    overflow-y: hidden;
+    overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
     overflow-x: hidden;
     z-index: 1000000;
@@ -39,12 +40,20 @@ body {
     box-sizing: border-box;
     /* border: 2px solid blue; */
     cursor: grab;
+    z-index: 2000;
 }
 
 .section {
     height: 100vh;
     width: 100vw;
-    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.episodes {
+    height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -56,9 +65,8 @@ body {
 
 .landingText {
     width: 50vw;
-    height: 50vh;
+    height: 100vh;
     margin-right: 60rem;
-    margin-bottom: 40rem;
 }
 
 .mainTextDiv {
@@ -69,12 +77,12 @@ body {
 
 #mainTextDiv1 {
     font-size: 32rem;
-    padding-bottom: 16rem;
+    /* padding-bottom: 16rem; */
 }
 
 #mainTextDiv2 {
     font-size: 24.75rem;
-    padding-bottom: 12rem;
+    margin-top: 6rem;
 }
 
 #mainTextDiv3 {
@@ -84,15 +92,15 @@ body {
 
 #mainTextDiv4 {
     font-size: 20rem;
-    padding-bottom: 10rem;
+    line-height: 80%;
 }
 
 .slider {
     width: 100vw;
-    height: 100vh;
+    height: 300vh;
     position: absolute;
     background-color: transparent;
-    backdrop-filter: blur(3px);
+    z-index: 1000;
 }
 
 .Bungee {
@@ -105,8 +113,78 @@ body {
     height: 20vh;
     top: 0;
     left: 10vw;
-    /* border: 2px solid red; */
     color: white;
     font-size: 4rem;
 }
 
+.episodeDetails {
+    width: 48vw;
+    height: 92.5vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    /* border: 2px solid red; */
+    padding-right: 2.5vw;
+    padding-left: 2.5vw;
+    /* background-color: rgba(255, 255, 255, 0.158);
+    border-radius: 1rem; */
+}
+
+.episodeName {
+    width: 100%;
+    height: 15vh;
+    font-size: 12rem;
+    /* border: 2px solid blue; */
+    white-space: nowrap; 
+}
+
+.volumeEpisode {
+    width: 100%;
+    height: 10vh;
+    font-size: 4rem;
+    /* text-align: right;  */
+    /* border: 2px solid white; */
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 1rem;
+}
+
+.picDiv {
+    width: 100%;
+    height: 52.5vh; 
+}
+
+.comment {
+    width: 100%;
+    height: 12.5vh;
+    font-size: 4rem;
+    /* border: 2px solid blue; */
+    font-family: 'Roboto', sans-serif;
+    text-align: right;
+}
+
+/* Bad Travelling */
+#ep1VE {
+    justify-content: flex-end;
+}
+
+#ep1 {
+    margin-left: 40vw;
+}
+
+#ep2VE {
+    justify-content: flex-start;
+}
+
+#ep2 {
+    margin-right: 40vw;
+}
+
+.right {
+    text-align: right;
+}
+
+.left {
+    text-align: left;
+}

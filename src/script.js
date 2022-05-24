@@ -7,7 +7,10 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import testVertexShader from './shaders/vertex.glsl'
 import testFragmentShader from './shaders/fragment.glsl'
+import thumbnailFragmentShader from './shaders/thumbnailFragment.glsl'
+import thumbnailVertexShader from './shaders/thumbnailVertex.glsl'
 import gsap from 'gsap'
+import ScrollToPlugin from "gsap/ScrollToPlugin";
 
 // Clear Scroll Memory
 window.history.scrollRestoration = 'manual'
@@ -46,6 +49,11 @@ const loadingManager = new THREE.LoadingManager(
 const textureLoader = new THREE.TextureLoader()
 const textures = []
 textures[0] = textureLoader.load('./images/Happy.png')
+textures[1] = textureLoader.load('./images/Scared.png')
+
+const thumbnails = []
+thumbnails[0] = textureLoader.load('./images/tn1.png')
+thumbnails[1] = textureLoader.load('./images/tn2.png')
 
 const doubleBlinkFrames = []
 doubleBlinkFrames[0] = textureLoader.load('./images/Idle1.png')
@@ -81,6 +89,7 @@ gltfLoader.setDRACOLoader(dracoLoader)
 const fontLoader = new FontLoader()
 
 const robotHead = new THREE.Group
+const robotHeadBig = new THREE.Group
 const leftEar = new THREE.Group
 const rightEar = new THREE.Group
 
@@ -140,11 +149,12 @@ rightEar.position.y = 2
 rightEar.position.x = -2.8
 robotHead.add(leftEar)
 robotHead.add(rightEar)
-robotHead.position.set(5,-2,-4)
+robotHeadBig.position.set(5,-2,-4)
 
-robotHead.rotation.y = -Math.PI/4
-robotHead.rotation.x = Math.PI/10
-scene.add(robotHead)
+robotHeadBig.rotation.y = -Math.PI/4
+robotHeadBig.rotation.x = Math.PI/10
+robotHeadBig.add(robotHead)
+scene.add(robotHeadBig)
 
 // Picture Parameters
 const parameters = {
@@ -159,8 +169,8 @@ const parameters = {
 }
 
 const waveClickParameters = {
-    waveFrequency: 1,
-    waveAmplitude: 0
+    waveFrequency: 0.5,
+    waveAmplitude: 0.8
 }
 
 const planeSize = {
@@ -174,7 +184,6 @@ const planeSize = {
 
 // Picture Parameters
 const pm2geometry = new THREE.PlaneGeometry(parameters.wideWidthFactor * 0.85, parameters.wideHeightFactor * 0.85, planeSize.wideWidth, planeSize.wideHeight)
-const count = pm2geometry.attributes.position.count
 
 // Material
 const pm2material = new THREE.RawShaderMaterial({
@@ -187,8 +196,6 @@ const pm2material = new THREE.RawShaderMaterial({
         uColor: {value: new THREE.Color('#aa00ff')},
         uTexture: { value: textures[1] },
         uAmplitude: {value: waveClickParameters.waveAmplitude},
-        uRotationX: {value: 0},
-        uRotationZ: {value: 1},
     },
     transparent: true,
     side: THREE.DoubleSide,
@@ -200,12 +207,104 @@ pictureMesh2.position.set(0,2,2.51)
 robotHead.add(pictureMesh2)
 pictureMesh2.frustumCulled = false
 
-// Lighting
+// Thumbnails
+const tn1geometry = new THREE.PlaneGeometry(parameters.widthFactor * 0.45, parameters.heightFactor * 0.45, planeSize.width, planeSize.height)
 
+// Material
+const tn1material = new THREE.RawShaderMaterial({
+    vertexShader: thumbnailVertexShader,
+    fragmentShader: thumbnailFragmentShader,
+    uniforms: {
+        uFrequency: {value: waveClickParameters.waveFrequency * 1.5},
+        uTime: {value: 0},
+        uOscillationFrequency: {value: 1},
+        uColor: {value: new THREE.Color('#aa00ff')},
+        uTexture: { value: thumbnails[0] },
+        uAmplitude: {value: waveClickParameters.waveAmplitude},
+    },
+    // transparent: true,
+    side: THREE.DoubleSide,
+})
+
+// Thumbnail Mesh 2
+let thumbnail1 = new THREE.Mesh(tn1geometry, tn1material)
+thumbnail1.position.set(3.3,-10,0)
+scene.add(thumbnail1)
+thumbnail1.frustumCulled = false
+
+// Thumbnails
+const tn2geometry = new THREE.PlaneGeometry(parameters.widthFactor * 0.45, parameters.heightFactor * 0.45, planeSize.width, planeSize.height)
+
+// Material
+const tn2material = new THREE.RawShaderMaterial({
+    vertexShader: thumbnailVertexShader,
+    fragmentShader: thumbnailFragmentShader,
+    uniforms: {
+        uFrequency: {value: waveClickParameters.waveFrequency * 1.5},
+        uTime: {value: 0},
+        uOscillationFrequency: {value: 1},
+        uColor: {value: new THREE.Color('#aa00ff')},
+        uTexture: { value: thumbnails[1] },
+        uAmplitude: {value: waveClickParameters.waveAmplitude},
+    },
+    // transparent: true,
+    side: THREE.DoubleSide,
+})
+
+// Thumbnail Mesh 2
+let thumbnail2 = new THREE.Mesh(tn2geometry, tn2material)
+thumbnail2.position.set(-3.3,-20,0)
+scene.add(thumbnail2)
+thumbnail2.frustumCulled = false
+
+// Particles
+const particlesCount = 70000
+const positions = new Float32Array(particlesCount * 3)
+
+for (let i=0; i<particlesCount*3; i++) {
+    positions[i*3 + 0] = ( Math.random() - 0.5 ) * 200
+    positions[i*3 + 1] = ( Math.random() - 0.5 ) * 300 + ( Math.random() * 10 )
+    positions[i*3 + 2] = Math.random()*-10 - 10
+}
+
+const particlesGeometry = new THREE.BufferGeometry()
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+const particlesMaterial = new THREE.PointsMaterial({
+    color: '#ffffff',
+    size: 0.03,
+    sizeAttenuation: true,
+    depthWrite: true,
+    blending: THREE.AdditiveBlending
+})
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+scene.add(particles)
+
+// Scroll
+const sectionDistance = 10
+
+let scrollX = 0
+let scrollY = 0
+
+window.addEventListener('scroll', () => {
+    scrollY = window.scrollY
+})
+
+// Mouse
+const mouse = {x: 0, y:0}
+
+window.addEventListener('mousemove', (event) =>
+{
+    mouse.x = event.clientX / sizes.width * 2 - 1
+    mouse.y = - (event.clientY / sizes.height) * 2 + 1
+})
+
+// Lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(ambientLight)
 
-const pointLight = new THREE.PointLight(0xffffff, 0.8)
+const pointLight = new THREE.PointLight(0xffffff, 1)
 scene.add(pointLight)
 
 const rectAreaLight = new THREE.RectAreaLight(0xffffff, 15, 4*0.8, 3*0.8)
@@ -248,7 +347,7 @@ window.addEventListener('resize', () => {
 const camera = new THREE.PerspectiveCamera(45, sizes.width / sizes.height, 0.1, 100)
 camera.position.set(0,0,10)
 camera.add(pointLight)
-pointLight.position.x += 5
+pointLight.position.x += 10
 pointLight.position.y += 10
 pointLight.position.z += 5
 scene.add(camera)
@@ -358,9 +457,23 @@ const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
+    // Update Times
+    tn1material.uniforms.uTime.value = elapsedTime
+    tn2material.uniforms.uTime.value = elapsedTime
+
+    // Face Changes
+    if (scrollY >= sizes.height*0.5) {
+        pm2material.uniforms.uTexture.value = textures[1]
+    }
+
+    console.log(robotHeadBig.position)
+
     robotHead.rotation.x = Math.sin(elapsedTime) * 0.1
-    robotHead.rotation.y = Math.sin(elapsedTime) * 0.1 - Math.PI/6
+    // robotHead.rotation.y = Math.sin(elapsedTime) * 0.1 - Math.PI/6
     robotHead.rotation.z = Math.cos(elapsedTime) * 0.1
+
+    // Camera Scroll
+    camera.position.y = -scrollY / sizes.height * sectionDistance
 
     // Update controls
     if (controls.enabled == true) {
@@ -399,3 +512,92 @@ const moveEars = () => {
     }, time*1000)
 }
 moveEars()
+
+// scrollTriggers
+gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollToPlugin)
+
+gsap.to(robotHeadBig.position, {x: 5, y: -2, z: -4})
+gsap.to(robotHeadBig.rotation, {x: Math.PI/10, y: -Math.PI/4})
+
+gsap.fromTo(robotHeadBig.position , {x: 5, y: -2, z: -4}, {
+    scrollTrigger: {
+        trigger: '.slider',
+        start: () =>  window.innerHeight*1 + ' bottom',
+        end: () =>  window.innerHeight*1 + ' top',
+        snap: 1,
+        scrub: true,
+        // markers: true
+    },
+    y: -2 - 10,
+    x: -5,
+    ease: 'none',
+})
+
+gsap.fromTo(robotHeadBig.rotation , {y: -Math.PI/4}, {
+    scrollTrigger: {
+        trigger: '.slider',
+        start: () => window.innerHeight*1 + ' bottom',
+        end: () => window.innerHeight*1 + ' top',
+        snap: 1,
+        scrub: true,
+        // markers: true
+    },
+    y: robotHeadBig.rotation.y + - Math.PI*1.5,
+    ease: 'none',
+})
+
+gsap.fromTo(thumbnail1.position, {x: 5}, {
+    scrollTrigger: {
+        trigger: '.slider',
+        start: () => window.innerHeight*1 + ' bottom',
+        end: () => window.innerHeight*1 + ' top',
+        snap: 1,
+        scrub: 1.5,
+        // markers: true
+    },
+    x: 3.3,
+    ease: 'none',
+})
+
+gsap.fromTo(robotHeadBig.position , {y: -12, x: -5}, {
+    scrollTrigger: {
+        trigger: '.slider',
+        start: () => window.innerHeight*2 + ' bottom',
+        end: () => window.innerHeight*2 + ' top',
+        snap: 1,
+        scrub: true,
+        // markers: true
+    },
+    x: 5,
+    y: -2 - 20,
+    ease: 'none',
+})
+
+gsap.fromTo(robotHeadBig.rotation , {x: robotHeadBig.rotation.x}, {
+    scrollTrigger: {
+        trigger: '.slider',
+        start: () => window.innerHeight*2 + ' bottom',
+        end: () => window.innerHeight*2 + ' top',
+        snap: 1,
+        scrub: true,
+        // markers: true
+    },
+    x: Math.PI*2,
+    y: -Math.PI/4,
+    // y: Math.PI*2,
+    ease: 'none',
+})
+
+gsap.fromTo(thumbnail2.position, {x: -5}, {
+    scrollTrigger: {
+        trigger: '.slider',
+        start: () => window.innerHeight*2 + ' bottom',
+        end: () => window.innerHeight*2 + ' top',
+        snap: 1,
+        scrub: 1.5,
+        // markers: true
+    },
+    x: -3.3,
+    ease: 'none',
+})

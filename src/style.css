@@ -59,6 +59,17 @@ body {
     align-items: center;
 }
 
+.doubleEpisodes {
+    height: 100vh;
+    width: 160vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* border: 2px solid blue; */
+    padding-left: 5vw;
+    padding-right: 5vw;
+}
+
 .Bebas {
     font-family: 'Bebas Neue', cursive;
 }
@@ -124,7 +135,22 @@ body {
     justify-content: flex-start;
     align-items: center;
     flex-direction: column;
+    border: 1px solid white;
+    padding-right: 2.5vw;
+    padding-left: 2.5vw;
+    /* background-color: rgba(255, 255, 255, 0.158);
+    border-radius: 1rem; */
+}
+
+.episodeDetailsHalf {
+    width: 48vw;
+    height: 92.5vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
     /* border: 2px solid red; */
+    border: 2px solid white;
     padding-right: 2.5vw;
     padding-left: 2.5vw;
     /* background-color: rgba(255, 255, 255, 0.158);
@@ -164,6 +190,14 @@ body {
     text-align: right;
 }
 
+.right {
+    text-align: right;
+}
+
+.left {
+    text-align: left;
+}
+
 /* Bad Travelling */
 #ep1VE {
     justify-content: flex-end;
@@ -179,12 +213,35 @@ body {
 
 #ep2 {
     margin-right: 40vw;
+    /* border: 2px solid white; */
 }
 
-.right {
-    text-align: right;
+#ep3VE {
+    justify-content: flex-end;
 }
 
-.left {
-    text-align: left;
+#ep3 {
+    /* border: 2px solid red; */
+}
+
+/* Scroll Bar */
+/* width */
+::-webkit-scrollbar {
+width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+background: #00000010;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+background: #a30000;
+border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+background: #a30000;
 }
